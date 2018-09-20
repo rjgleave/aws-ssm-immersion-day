@@ -21,40 +21,50 @@ Metadata:
       - Label:
           default: Settings
         Parameters:
-          - Fleet
+          - Environment
 
       - Label:
           default: |
-            You can use this template to create a sample fleet of four
-            instances, including the necessary networking resources.
+            You can drop this reference implementation into your existing
+            infrastructure. You can also optionally create a sample fleet
+            of four instances, including the necessary networking resources.
         Parameters:
           - CreateFleet
 
+      - Label:
+          default: |
+        Parameters:
+          - Initials
+
 
     ParameterLabels:
-      Fleet:
-        default: Name of Your Fleet
+      Environment:
+        default: Managed Instances Tag Value
 
       CreateFleet:
         default: Create Sample Fleet?
+
+      Initials:
+        default: Your 3 Initials
 
 #==================================================
 # Parameters
 #==================================================
 Parameters:
 
-  Fleet:
+  Environment:
     Description: |
       A sample fleet of EC2 instances will be launched.   Each instance will launch
-      with the tag name of "Fleet" and will use the value you provide here.
+      with the tag name of "Environment" and will use the value you provide here.
     Type: String
+    Default: prod
     MinLength: 1
-    MaxLength: 10
+    MaxLength: 255
     AllowedPattern: ^[a-zA-Z0-9+-=._:/@ ]*$
     ConstraintDescription: |
-      Malformed Input Parameter: Fleet name must contain only upper and lower
+      Malformed Input Parameter: Environment must contain only upper and lower
       case letters, numbers, and the characters '+,-,=,.,_,:,/,@'. Minimum length
-      is 1 and maximum length is 10.
+      is 1 and maximum length is 255.
 
   CreateFleet:
     Description: |
@@ -66,6 +76,14 @@ Parameters:
       - "Yes"
       - "No"
     Default: "Yes"
+
+  Initials:
+    Description: |
+      User initials (3 lowercase letters) which will be appended to the instance name.
+    Type: String
+    MinLength: 1
+    MaxLength: 3
+    AllowedPattern: "[a-z]+"
 
 
 #==================================================
@@ -171,7 +189,7 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     Properties:
-      BucketName: !Join [ '-', [!Ref Fleet, "ssm-lab"] ]
+      BucketName: !Join [ '-', [!Ref Initials, "ssm-lab"] ]
       AccessControl: Private
       BucketEncryption:
         ServerSideEncryptionConfiguration:
@@ -258,9 +276,9 @@ Resources:
     Type: AWS::SSM::Parameter
     Properties:
       Name: ManagedInstanceTagValue
-      Value: !Ref Fleet
+      Value: !Ref Environment
       Type: String
-      Description: Fleet tag value given to Server Fleet Management Solution managed instances
+      Description: Environment tag value given to Server Fleet Management Solution managed instances
 
 
   #==================================================
@@ -485,9 +503,11 @@ Resources:
           - !Ref 'InstanceSecurityGroup'
       Tags:
         - Key: Name
-          Value: !Join [ '-', [!Ref Fleet, "RHEL"] ]
-        - Key: Fleet
-          Value: !Ref Fleet
+          Value: !Join [ '-', [!Ref Initials, "RHEL"] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Patch Group
+          Value: !Ref Environment
       UserData:
         Fn::Base64:
           !Sub |
@@ -512,9 +532,11 @@ Resources:
           - !Ref 'InstanceSecurityGroup'
       Tags:
         - Key: Name
-          Value: !Join [ '-', [!Ref Fleet, "UBUN"] ]
-        - Key: Fleet
-          Value: !Ref Fleet
+          Value: !Join [ '-', [!Ref Initials, "UBUN"] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Patch Group
+          Value: !Ref Environment
       UserData:
         Fn::Base64:
           !Sub |
@@ -540,9 +562,11 @@ Resources:
           - !Ref 'InstanceSecurityGroup'
       Tags:
         - Key: Name
-          Value: !Join [ '-', [!Ref Fleet, "ALX"] ]
-        - Key: Fleet
-          Value: !Ref Fleet
+          Value: !Join [ '-', [!Ref Initials, "ALX"] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Patch Group
+          Value: !Ref Environment
 
   Windows2012:
     Type: AWS::EC2::Instance
@@ -560,9 +584,11 @@ Resources:
           - !Ref 'InstanceSecurityGroup'
       Tags:
         - Key: Name
-          Value: !Join [ '-', [!Ref Fleet, "WIN"] ]
-        - Key: Fleet
-          Value: !Ref Fleet
+          Value: !Join [ '-', [!Ref Initials, "WIN"] ]
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Patch Group
+          Value: !Ref Environment
 
 #==================================================
 # AMI of Windows and Linux at Runtime
