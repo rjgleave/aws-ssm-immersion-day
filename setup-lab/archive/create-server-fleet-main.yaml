@@ -488,12 +488,6 @@ Resources:
           Value: !Join [ '-', [!Ref Fleet, "RHEL"] ]
         - Key: Fleet
           Value: !Ref Fleet
-        - Key: OS
-          Value: "RHEL"
-        - Key: Environment
-          Value: "Prod"
-        - Key: InstanceRole
-          Value: "Webserver"
       UserData:
         Fn::Base64:
           !Sub |
@@ -521,12 +515,6 @@ Resources:
           Value: !Join [ '-', [!Ref Fleet, "UBUN"] ]
         - Key: Fleet
           Value: !Ref Fleet
-        - Key: OS
-          Value: "UBUN"
-        - Key: Environment
-          Value: "Test"
-        - Key: InstanceRole
-          Value: "Webserver"
       UserData:
         Fn::Base64:
           !Sub |
@@ -555,12 +543,6 @@ Resources:
           Value: !Join [ '-', [!Ref Fleet, "ALX"] ]
         - Key: Fleet
           Value: !Ref Fleet
-        - Key: OS
-          Value: "ALX"
-        - Key: Environment
-          Value: "Prod"
-        - Key: InstanceRole
-          Value: "Webserver"
 
   Windows2012:
     Type: AWS::EC2::Instance
@@ -581,12 +563,6 @@ Resources:
           Value: !Join [ '-', [!Ref Fleet, "WIN"] ]
         - Key: Fleet
           Value: !Ref Fleet
-        - Key: OS
-          Value: "WIN"
-        - Key: Environment
-          Value: "Prod"
-        - Key: InstanceRole
-          Value: "Webserver"
 
 #==================================================
 # AMI of Windows and Linux at Runtime
