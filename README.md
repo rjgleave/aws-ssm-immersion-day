@@ -10,18 +10,12 @@ What's Here
 This repo includes:
 
 1. README.md - this file
-2. FOLDER: dynamo - this contains code to help build the tag group table in dynamoDB.  It includes:
-    *   createTagGroupTable.py - a program to create the base dynamo table
-    *   DataEntryTemplate.xlsx - an Excel template with sample data for the dynamo table
-    *   sample-data.csv - a CSV extract of the excel file above
-    *   sample-data.json - a JSON equivalent to the CSV file above
-    *   loadTagGroupTable.py - a program to load the dynamodb table with sample data
-3. FOLDER: policy - contains a json file for defining a custom policy:  custom-tag-group-policy.json
-4. FOLDER: tag-builder-direct  - It includes:
-    *   tagbuilder.py - the main lambda program to update resources with tags.  
-5. FOLDER: tag-builder-lambda - It includes:
-    *   tagbuilder-paginate.py - same as lambda program above, except can be called from command line.
-6. FOLDER: api-throttler - contains the lambda which is triggered by SQS.  This performs the call to the AWS ResourceGroupsAPI to update tags if you are operating in de-coupled mode (see the SQS-ENABLED environment variable below)
+2. FOLDER: setup-lab - this contains code to setup the lab environment.  It includes:
+    *   create-ssm-roles.yaml - a cloudformation template to create the necessary roles to perform the lab exercises
+    *   create-server-fleet.yaml - a cloudformation template which will create a fleet of 4 sample EC2 instances, representing multiple operating systems.   It includes pre-built tags to eliminate busy work that is not relevant to learning about SSM.
+    *   s3-bucket-permissions.json - a policy document to allow S3 to act as inventory repository
+3. FOLDER: run-command - contains various CLI examples for invoking remote commands from the command line
+
 
 Setup Instructions
 ------------------
