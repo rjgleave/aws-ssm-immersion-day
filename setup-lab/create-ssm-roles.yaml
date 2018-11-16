@@ -5,6 +5,7 @@ Resources:
   ManagedInstanceRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: ManagedInstanceRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:

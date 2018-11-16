@@ -492,7 +492,7 @@ Resources:
           Value: "RHEL"
         - Key: Environment
           Value: "Prod"
-        - Key: InstanceRole
+        - Key: Category
           Value: "Webserver"
       UserData:
         Fn::Base64:
@@ -525,7 +525,7 @@ Resources:
           Value: "UBUN"
         - Key: Environment
           Value: "Test"
-        - Key: InstanceRole
+        - Key: Category
           Value: "Webserver"
       UserData:
         Fn::Base64:
@@ -559,7 +559,7 @@ Resources:
           Value: "ALX"
         - Key: Environment
           Value: "Prod"
-        - Key: InstanceRole
+        - Key: Category
           Value: "Webserver"
 
   Windows2012:
@@ -585,7 +585,7 @@ Resources:
           Value: "WIN"
         - Key: Environment
           Value: "Prod"
-        - Key: InstanceRole
+        - Key: Category
           Value: "Webserver"
 
 #==================================================
