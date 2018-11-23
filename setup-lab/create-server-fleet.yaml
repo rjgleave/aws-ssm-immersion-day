@@ -33,7 +33,7 @@ Metadata:
 
     ParameterLabels:
       Fleet:
-        default: Name of Your Fleet
+        default: Name of Your Fleet (single word, all lower case)
 
       CreateFleet:
         default: Create Sample Fleet?
@@ -173,49 +173,6 @@ Resources:
     Properties:
       BucketName: !Join [ '-', [!Ref Fleet, "ssm-lab"] ]
       AccessControl: Private
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              KMSMasterKeyID: !Ref ArtifactBucketEncryptionKey
-              SSEAlgorithm: aws:kms
-
-  #==================================================
-  # Create a KMS key to use for S3 object encryption
-  #==================================================
-  ArtifactBucketEncryptionKey:
-    Type: AWS::KMS::Key
-    Properties:
-      Description: Key used for Server Fleet Management Solution artifact bucket
-      Enabled: true
-      EnableKeyRotation: true
-      KeyPolicy:
-        Statement:
-        - Sid: manage-key
-          Action:
-          - kms:*
-          Effect: Allow
-          Principal:
-            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-          Resource: "*"
-        - Sid: ssm-access-policy-statement
-          Action:
-          - kms:GenerateDataKey
-          Effect: Allow
-          Principal:
-            Service: ssm.amazonaws.com
-          Resource: "*"
-
-  #==================================================
-  # Create an alias for the KMS key
-  # The alias is created here so that it is more easily
-  # identifiable in the console; key aliases cannot be
-  # used in policies.
-  #==================================================
-  ArtifactBucketEncryptionKeyAlias:
-    Type: AWS::KMS::Alias
-    Properties:
-      AliasName: alias/ssm-bucket-encryption-key
-      TargetKeyId: !Ref ArtifactBucketEncryptionKey
 
   #==================================================
   # Allow the SSM service to use this bucket
@@ -245,22 +202,6 @@ Resources:
             Condition:
               StringEquals:
                 s3:x-amz-acl: bucket-owner-full-control
-              # StringEquals:
-              #   s3:x-amz-server-side-encryption: aws:kms
-              #   s3:x-amz-server-side-encryption-aws-kms-key-id: !GetAtt ArtifactBucketEncryptionKey.Arn
-
-
-
-  #==================================================
-  # Store the managed instance tag value in Parameter Store
-  #==================================================
-  ManagedInstanceTagValueParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: ManagedInstanceTagValue
-      Value: !Ref Fleet
-      Type: String
-      Description: Fleet tag value given to Server Fleet Management Solution managed instances
 
 
   #==================================================
@@ -486,14 +427,14 @@ Resources:
       Tags:
         - Key: Name
           Value: !Join [ '-', [!Ref Fleet, "RHEL"] ]
-        - Key: Fleet
+        - Key: fleet
           Value: !Ref Fleet
-        - Key: OS
+        - Key: os
           Value: "RHEL"
-        - Key: Environment
-          Value: "Prod"
-        - Key: Category
-          Value: "Webserver"
+        - Key: environment
+          Value: "prod"
+        - Key: category
+          Value: "webserver"
       UserData:
         Fn::Base64:
           !Sub |
@@ -519,14 +460,14 @@ Resources:
       Tags:
         - Key: Name
           Value: !Join [ '-', [!Ref Fleet, "UBUN"] ]
-        - Key: Fleet
+        - Key: fleet
           Value: !Ref Fleet
-        - Key: OS
+        - Key: os
           Value: "UBUN"
-        - Key: Environment
-          Value: "Test"
-        - Key: Category
-          Value: "Webserver"
+        - Key: environment
+          Value: "test"
+        - Key: category
+          Value: "webserver"
       UserData:
         Fn::Base64:
           !Sub |
@@ -553,14 +494,14 @@ Resources:
       Tags:
         - Key: Name
           Value: !Join [ '-', [!Ref Fleet, "ALX"] ]
-        - Key: Fleet
+        - Key: fleet
           Value: !Ref Fleet
-        - Key: OS
+        - Key: os
           Value: "ALX"
-        - Key: Environment
-          Value: "Prod"
-        - Key: Category
-          Value: "Webserver"
+        - Key: environment
+          Value: "prod"
+        - Key: category
+          Value: "webserver"
 
   Windows2012:
     Type: AWS::EC2::Instance
@@ -579,14 +520,14 @@ Resources:
       Tags:
         - Key: Name
           Value: !Join [ '-', [!Ref Fleet, "WIN"] ]
-        - Key: Fleet
+        - Key: fleet
           Value: !Ref Fleet
-        - Key: OS
+        - Key: os
           Value: "WIN"
-        - Key: Environment
-          Value: "Prod"
-        - Key: Category
-          Value: "Webserver"
+        - Key: environment
+          Value: "prod"
+        - Key: category
+          Value: "webserver"
 
 #==================================================
 # AMI of Windows and Linux at Runtime
@@ -722,21 +663,6 @@ Outputs:
     Export:
       Name: !Sub ${AWS::StackName}-ArtifactBucket
     Value: !Ref ArtifactBucket
-
-  ArtifactBucketEncryptionKey:
-    Export:
-      Name: !Sub ${AWS::StackName}-ArtifactBucketEncryptionKey
-    Value: !Ref ArtifactBucketEncryptionKey
-
-  ArtifactBucketEncryptionKeyAlias:
-    Export:
-      Name: !Sub ${AWS::StackName}-ArtifactBucketEncryptionKeyAlias
-    Value: !Ref ArtifactBucketEncryptionKeyAlias
-
-  ManagedInstanceTagValueParameter:
-    Export:
-      Name: !Sub ${AWS::StackName}-ManagedInstanceTagValueParameter
-    Value: !Ref ManagedInstanceTagValueParameter
 
   VPC:
     Condition: CreateFleet

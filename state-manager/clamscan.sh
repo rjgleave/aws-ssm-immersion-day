@@ -1,0 +1,2 @@
+cd /
+clamscan -ri
