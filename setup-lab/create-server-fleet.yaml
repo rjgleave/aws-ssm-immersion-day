@@ -68,6 +68,12 @@ Parameters:
     Default: "Yes"
 
 
+  SSMAdminPassword:
+    Type: String
+    NoEcho: True
+    MinLength: 1
+    Description: Password for the SSM Admin
+
 #==================================================
 # Conditions
 #==================================================
@@ -163,6 +169,81 @@ Mappings:
 #==================================================
 Resources:
 
+  ManagedInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ManagedInstanceRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ssm.amazonaws.com
+            - ec2.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      Path: "/"
+
+  ManagedInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+      - !Ref ManagedInstanceRole
+      InstanceProfileName: ManagedInstanceProfile 
+
+  AutomationServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ssm.amazonaws.com
+            - ec2.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole
+      Path: "/"
+      RoleName: AutomationServiceRole
+      Policies:
+      - PolicyName: passrole
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - iam:PassRole
+            Resource:
+            - !GetAtt ManagedInstanceRole.Arn
+
+  # -------------------------------------------------------------------------
+  # IAM group for Administrator Profiles 
+  AdminGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: AdminGroup
+      Path: "/"
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  # -------------------------------------------------------------------------
+  # Create Admin User Profiles
+  SSMAdmin:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: SSMAdmin
+      Path: "/"
+      LoginProfile:
+        Password: !Ref SSMAdminPassword
+      Groups: 
+        - !Ref AdminGroup
+
+        
 
   #==================================================
   # S3 bucket for saved SSM artifacts
